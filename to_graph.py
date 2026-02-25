@@ -25,6 +25,7 @@ print(data_y)
 print(data_x)
 
 mb.plot(data_x, data_y)
+mb.plot((data_x[0], data_x[-1]), (data_y[0], data_y[-1]))
 mb.xlabel("Время, дни")
 mb.ylabel("Вес, сторипоинты")
 mb.show()
