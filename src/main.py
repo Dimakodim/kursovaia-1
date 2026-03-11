@@ -10,6 +10,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from aiogram.filters.command import Command, CommandObject
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = "8748414894:AAH7Kej4ainQsEj7NWJGUUN0zbgXyHIHOJM"
@@ -26,12 +27,48 @@ async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
+    try:
+        cursor.execute(f"INSERT INTO users (user_id) VALUES ({message.from_user.id})")
+        conn.commit()
+        await message.answer(f"Привет, {html.bold(message.from_user.full_name)}!")
+    except sqlite3.IntegrityError:
+        await message.answer("Уже здоровались")
+
+@dp.message(Command("create"))
+async def create_queue(
+        message: Message,
+        command: CommandObject
+):
+    if command.args is None:
+        await message.answer(
+            "Ошибка: не переданы аргументы"
+        )
+        return
+    
+    queue_name = command.args
+
+    cursor.execute(f'SELECT id FROM users WHERE user_id = {message.from_user.id}')
+    author_id = cursor.fetchall()[0][0]
+
+    cursor.execute("INSERT INTO queue (name, author_id) VALUES (?, ?)", (queue_name, author_id))
+    conn.commit()
+    await message.answer(
+        f"Создана очередь: {queue_name}"
+    )        
+
+@dp.message(Command("list"))
+async def print_list(
+        message: Message
+):
+    cursor.execute(f'SELECT id FROM users WHERE user_id = {message.from_user.id}')
+    author_id = cursor.fetchall()[0][0]
+
+    cursor.execute(f'SELECT name FROM queue WHERE author_id = {author_id}')
+    conn.commit()
+    await message.answer(
+        f"Очереди: {cursor.fetchall()}"
+    ) 
+    
 
 
 @dp.message()
