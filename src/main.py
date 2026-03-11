@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import sys
+import sqlite3
+
 from os import getenv
 
 from aiogram import Bot, Dispatcher, html
@@ -15,6 +17,8 @@ TOKEN = "8748414894:AAH7Kej4ainQsEj7NWJGUUN0zbgXyHIHOJM"
 # All handlers should be attached to the Router (or Dispatcher)
 
 dp = Dispatcher()
+conn = sqlite3.connect('src/data.db', check_same_thread=False)
+cursor = conn.cursor()
 
 
 @dp.message(CommandStart())
