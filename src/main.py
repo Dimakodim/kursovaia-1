@@ -14,17 +14,20 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.client.session.aiohttp import AiohttpSession
 
 from modules.start.start_module import start_router
+from modules.create.create_module import create_router
+from modules.join.join_module import join_router
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = "8748414894:AAGEbVkb1vkWTMoY-ifzOnn-Y2S1W7IHOb0"
 
 # All handlers should be attached to the Router (or Dispatcher)
+PROXY_URL = 'http://127.0.0.1:12334'
 
 dp = Dispatcher()
 conn = sqlite3.connect('src/data.db', check_same_thread=False)
 cursor = conn.cursor()
 
-@dp.message(Command("create"))
+""" @dp.message(Command("create"))
 async def create_queue(
         message: Message,
         command: CommandObject
@@ -44,7 +47,7 @@ async def create_queue(
     conn.commit()
     await message.answer(
         f"Создана очередь: {queue_name}"
-    )        
+    )   """      
 
 @dp.message(Command("list"))
 async def print_list(
@@ -61,13 +64,16 @@ async def print_list(
 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    session = AiohttpSession(proxy=PROXY_URL)
+    bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # And the run events dispatching
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
     dp.include_router(start_router)
+    dp.include_router(create_router)
+    dp.include_router(join_router)
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
