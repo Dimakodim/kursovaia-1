@@ -64,8 +64,10 @@ async def print_list(
 
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
-    session = AiohttpSession(proxy=PROXY_URL)
-    bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    
+    #session = AiohttpSession(proxy=PROXY_URL)
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    # bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # And the run events dispatching
     await dp.start_polling(bot)
 
