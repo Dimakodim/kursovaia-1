@@ -16,6 +16,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from modules.start.start_module import start_router
 from modules.create.create_module import create_router
 from modules.join.join_module import join_router
+from modules.list.list_module import list_router
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = "8748414894:AAGEbVkb1vkWTMoY-ifzOnn-Y2S1W7IHOb0"
@@ -49,23 +50,10 @@ async def create_queue(
         f"Создана очередь: {queue_name}"
     )   """      
 
-@dp.message(Command("list"))
-async def print_list(
-        message: Message
-):
-    cursor.execute(f'SELECT id FROM users WHERE user_id = {message.from_user.id}')
-    author_id = cursor.fetchall()[0][0]
-
-    cursor.execute(f'SELECT name FROM queue WHERE author_id = {author_id}')
-    conn.commit()
-    await message.answer(
-        f"Очереди: {cursor.fetchall()}"
-    ) 
-
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     
-    #session = AiohttpSession(proxy=PROXY_URL)
+    # session = AiohttpSession(proxy=PROXY_URL)
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # And the run events dispatching
@@ -76,6 +64,7 @@ if __name__ == "__main__":
     dp.include_router(start_router)
     dp.include_router(create_router)
     dp.include_router(join_router)
+    dp.include_router(list_router)
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
