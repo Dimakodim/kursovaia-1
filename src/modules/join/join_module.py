@@ -17,7 +17,7 @@ class JoinState(StatesGroup):
     loading = State()
 
 @join_router.message(Command("join"), StateFilter(None))
-@join_router.message(F.text.contains("Присоедениться к очереди 🗝️"), StateFilter(None))
+@join_router.message(F.text.contains("Присоединиться к очереди 🗝️"), StateFilter(None))
 async def command_join_handler(message: Message, state: FSMContext) -> None:
     await message.answer(f'Введите код приглашения:', reply_markup=join_kb())
 
