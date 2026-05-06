@@ -17,9 +17,10 @@ from modules.start.start_module import start_router
 from modules.create.create_module import create_router
 from modules.join.join_module import join_router
 from modules.list.list_module import list_router
+from modules.show_queue.show_queue_module import show_queue_router
 
 # Bot token can be obtained via https://t.me/BotFather
-TOKEN = "8748414894:AAGEbVkb1vkWTMoY-ifzOnn-Y2S1W7IHOb0"
+TOKEN = "8748414894:AAFSJ-l21rAvWGpysCLhktEZjoQACFAGsG8"
 
 # All handlers should be attached to the Router (or Dispatcher)
 PROXY_URL = 'http://127.0.0.1:12334'
@@ -28,34 +29,12 @@ dp = Dispatcher()
 conn = sqlite3.connect('src/data.db', check_same_thread=False)
 cursor = conn.cursor()
 
-""" @dp.message(Command("create"))
-async def create_queue(
-        message: Message,
-        command: CommandObject
-):
-    if command.args is None:
-        await message.answer(
-            "Ошибка: не переданы аргументы"
-        )
-        return
-    
-    queue_name = command.args
-
-    cursor.execute(f'SELECT id FROM users WHERE user_id = {message.from_user.id}')
-    author_id = cursor.fetchall()[0][0]
-
-    cursor.execute("INSERT INTO queue (name, author_id) VALUES (?, ?)", (queue_name, author_id))
-    conn.commit()
-    await message.answer(
-        f"Создана очередь: {queue_name}"
-    )   """      
-
 async def main() -> None:
     # Initialize Bot instance with default bot properties which will be passed to all API calls
     
-    # session = AiohttpSession(proxy=PROXY_URL)
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    # bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    session = AiohttpSession(proxy=PROXY_URL)
+    # bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     # And the run events dispatching
     await dp.start_polling(bot)
 
@@ -65,6 +44,7 @@ if __name__ == "__main__":
     dp.include_router(create_router)
     dp.include_router(join_router)
     dp.include_router(list_router)
+    dp.include_router(show_queue_router)
 
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
