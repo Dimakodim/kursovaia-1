@@ -28,7 +28,7 @@ async def id_queue_handler(message: Message, state: FSMContext, bot: Bot) -> Non
                 if user_id:
                     if user_id[0] == message.from_user.id: you_text = ' - вы'
                     chat = await bot.get_chat(chat_id=user_id[0])
-                    text_queue.append(BlockQuote(f'{i+1}) {chat.full_name}'+you_text))
+                    text_queue.append(BlockQuote(f'{i+1}) {chat.full_name}'+you_text)+"\n")
             admin_id = getTgIdById(queue[0][2])
             admin_text = ''
             if admin_id:
