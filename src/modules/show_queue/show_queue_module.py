@@ -72,11 +72,27 @@ async def handle_callback(
             leaveQueue(query.from_user.id, callback_data.id)
             await query.message.delete()
         case "btn_5":
-            pass
+            queue = showQueue(query.from_user.id, callback_data.id)
+            await query.message.edit_reply_markup(reply_markup=delete_kb(len(json.loads(queue[0][4])), callback_data.id))
         case "btn_6":
-            pass
+            deleteQueue(query.from_user.id, callback_data.id)
+            await query.message.delete()
         case _:
-            pass
+            content, kb = await updateQueue(query.from_user.id, callback_data.id, bot)
+            await query.message.edit_text(**content.as_kwargs())
+            await query.message.edit_reply_markup(reply_markup=kb)
+
+@show_queue_router.callback_query(DeleteCallback.filter())
+async def handle_callback(
+    query: CallbackQuery, 
+    callback_data: DeleteCallback,
+    bot: Bot
+):
+    await query.answer()
+    kickQueue(query.from_user.id, callback_data.queue_id, callback_data.id)
+    content, kb = await updateQueue(query.from_user.id, callback_data.queue_id, bot)
+    await query.message.edit_text(**content.as_kwargs())
+    await query.message.edit_reply_markup(reply_markup=kb)
 
 async def updateQueue(user_ids, id, bot):
     queue = showQueue(user_ids, id)
