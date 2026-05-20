@@ -16,6 +16,7 @@ show_queue_router = Router()
 @show_queue_router.message(StateFilter(ListState.id_input))
 async def id_queue_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     try:
+        kb = show_queue_kb()
         queue = showQueue(message.from_user.id, message.text)
         if len(queue) == 0:
             await message.answer("Ошибка! Такой очереди не существует!")
@@ -34,8 +35,10 @@ async def id_queue_handler(message: Message, state: FSMContext, bot: Bot) -> Non
             if admin_id:
                 chat = await bot.get_chat(chat_id=admin_id[0])
                 admin_text = ['\n\nАдминистратор очереди: ', Code(chat.full_name)]
+                if admin_id[0] == message.from_user.id:
+                    kb = show_queue_kb(True)
             content = Text(Code(queue[0][1]), '\n\n', *text_queue, *admin_text)
-            await message.answer(**content.as_kwargs(), reply_markup=show_queue_kb())
+            await message.answer(**content.as_kwargs(), reply_markup=kb)
             await state.clear()
 
     except ValueError:
